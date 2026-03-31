@@ -13,6 +13,8 @@ export type ScaleFormula = {
 export const SCALE_LIBRARY: ScaleFormula[] = [
   { id: 'major', name: 'Maior (Jonio)', family: 'diatonic', intervals: [0, 2, 4, 5, 7, 9, 11] },
   { id: 'natural_minor', name: 'Menor Natural (Aeolio)', family: 'diatonic', intervals: [0, 2, 3, 5, 7, 8, 10] },
+  { id: 'harmonic_minor', name: 'Menor Harmonica', family: 'diatonic', intervals: [0, 2, 3, 5, 7, 8, 11] },
+  { id: 'melodic_minor', name: 'Menor Melodica', family: 'diatonic', intervals: [0, 2, 3, 5, 7, 9, 11] },
   { id: 'dorian', name: 'Dorico', family: 'mode', intervals: [0, 2, 3, 5, 7, 9, 10] },
   { id: 'phrygian', name: 'Frigio', family: 'mode', intervals: [0, 1, 3, 5, 7, 8, 10] },
   { id: 'lydian', name: 'Lidio', family: 'mode', intervals: [0, 2, 4, 6, 7, 9, 11] },
