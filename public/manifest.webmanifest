@@ -1,0 +1,19 @@
+{
+  "name": "KCords",
+  "short_name": "KCords",
+  "description": "Ferramenta de estudo de harmonia para guitarristas.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#f59e0b",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
