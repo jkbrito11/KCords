@@ -102,13 +102,15 @@ export function generateChordVoicings(
     return []
   }
 
+  const requiredUniqueNotes = Math.min(chordSet.size, 4)
+
   const fretboard = buildFretboard(tuning, fretCount)
   const openStringPitches = buildOpenStringPitches(tuning)
   const stringCount = tuning.length
   const maxFretToSearch = Math.min(fretCount, 12)
   const bestBySignature = new Map<string, { positions: FretPosition[]; score: number }>()
 
-  const groupSizes = [3, 4]
+  const groupSizes = requiredUniqueNotes >= 4 ? [4] : [3, 4]
 
   for (const groupSize of groupSizes) {
     for (let start = 0; start <= stringCount - groupSize; start += 1) {
@@ -139,7 +141,7 @@ export function generateChordVoicings(
             return
           }
 
-          if (notesUsed.size < 3) {
+          if (notesUsed.size < requiredUniqueNotes) {
             return
           }
 
