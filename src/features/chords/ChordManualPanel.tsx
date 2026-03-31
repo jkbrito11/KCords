@@ -22,6 +22,13 @@ export function ChordManualPanel({ activeChordKey, onSelectChord }: ChordManualP
   const isActive = activeChordKey === currentKey
   const triads = harmonicField(root, scaleId, 3)
   const tetrads = harmonicField(root, scaleId, 4)
+  const harmonicChordIds = new Set(
+    [...triads, ...tetrads]
+      .map((harmonicChord) => CHORD_LIBRARY.find((item) => item.symbol === harmonicChord.quality)?.id)
+      .filter((value): value is string => Boolean(value)),
+  )
+  const harmonicSelectorOptions = CHORD_LIBRARY.filter((item) => harmonicChordIds.has(item.id))
+  const nonHarmonicSelectorOptions = CHORD_LIBRARY.filter((item) => !harmonicChordIds.has(item.id))
 
   const isContextChordActive = (name: string, chordNotesList: string[]) => activeChordKey === `${name}:${chordNotesList.join('-')}`
 
@@ -76,13 +83,24 @@ export function ChordManualPanel({ activeChordKey, onSelectChord }: ChordManualP
           <label className="grid gap-1 text-xs text-zinc-400">
             Acorde manual sobre a tônica selecionada ({root})
             <Select value={chordId} onChange={(event) => setChordId(event.currentTarget.value)}>
-              {CHORD_LIBRARY.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
+              <optgroup label="Do campo harmonico atual">
+                {harmonicSelectorOptions.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    * {item.name}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Outras opcoes">
+                {nonHarmonicSelectorOptions.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </optgroup>
             </Select>
           </label>
+
+          <p className="text-xs text-zinc-500">Opcoes com * pertencem ao campo harmonico de {root} {scaleLabel(scaleId)}.</p>
         </div>
 
         <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-300">
