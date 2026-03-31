@@ -44,9 +44,13 @@ export function App() {
   )
 
   useEffect(() => {
-    setChordDisplayMode('full-neck')
-    setActiveVoicingIndex(0)
-  }, [activeChordKey])
+    setActiveVoicingIndex((index) => {
+      if (chordVoicings.length === 0) {
+        return 0
+      }
+      return Math.min(index, chordVoicings.length - 1)
+    })
+  }, [chordVoicings.length])
 
   const selectedVoicing = chordVoicings[activeVoicingIndex] ?? null
 
