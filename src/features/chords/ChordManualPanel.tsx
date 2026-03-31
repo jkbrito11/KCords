@@ -6,15 +6,18 @@ import { CHORD_LIBRARY, chordNotes } from '../../domain/music/chords'
 import { NOTE_OPTIONS } from '../../lib/music-constants'
 
 type ChordManualPanelProps = {
+  activeChordKey: string | null
   onSelectChord: (chord: { name: string; notes: string[] }) => void
 }
 
-export function ChordManualPanel({ onSelectChord }: ChordManualPanelProps) {
+export function ChordManualPanel({ activeChordKey, onSelectChord }: ChordManualPanelProps) {
   const [root, setRoot] = useState<string>('C')
   const [chordId, setChordId] = useState<string>('maj')
 
   const chord = CHORD_LIBRARY.find((item) => item.id === chordId) ?? CHORD_LIBRARY[0]
   const notes = chordNotes(root, chord.id)
+  const currentKey = `${root}${chord.symbol}:${notes.join('-')}`
+  const isActive = activeChordKey === currentKey
 
   return (
     <Card>
@@ -49,6 +52,7 @@ export function ChordManualPanel({ onSelectChord }: ChordManualPanelProps) {
         </div>
 
         <Button
+          variant={isActive ? 'default' : 'secondary'}
           onClick={() =>
             onSelectChord({
               name: `${root}${chord.symbol}`,
@@ -56,7 +60,7 @@ export function ChordManualPanel({ onSelectChord }: ChordManualPanelProps) {
             })
           }
         >
-          Destacar acorde no fretboard
+          {isActive ? 'Remover highlight do acorde' : 'Destacar acorde no fretboard'}
         </Button>
       </div>
     </Card>

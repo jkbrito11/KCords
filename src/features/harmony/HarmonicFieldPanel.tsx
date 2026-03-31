@@ -5,10 +5,15 @@ import { harmonicField, relativeOptions, scaleLabel } from '../../domain/music/h
 type HarmonicFieldPanelProps = {
   root: string
   scaleId: string
+  activeChordKey: string | null
   onSelectChord: (chord: { name: string; notes: string[] }) => void
 }
 
-export function HarmonicFieldPanel({ root, scaleId, onSelectChord }: HarmonicFieldPanelProps) {
+function chordKey(chord: { name: string; notes: string[] }) {
+  return `${chord.name}:${chord.notes.join('-')}`
+}
+
+export function HarmonicFieldPanel({ root, scaleId, activeChordKey, onSelectChord }: HarmonicFieldPanelProps) {
   const triads = harmonicField(root, scaleId, 3)
   const tetrads = harmonicField(root, scaleId, 4)
   const relatives = relativeOptions(root, scaleId)
@@ -25,38 +30,46 @@ export function HarmonicFieldPanel({ root, scaleId, onSelectChord }: HarmonicFie
           <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3">
             <p className="text-xs font-semibold text-zinc-200">Triades</p>
             <div className="mt-2 grid gap-2">
-              {triads.map((chord) => (
-                <Button
-                  key={`triad-${chord.degree}`}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onSelectChord({ name: chord.name, notes: chord.notes })}
-                  className="justify-between"
-                >
-                  <span>
-                    {chord.roman} - {chord.name}
-                  </span>
-                </Button>
-              ))}
+              {triads.map((chord) => {
+                const isActive = chordKey({ name: chord.name, notes: chord.notes }) === activeChordKey
+
+                return (
+                  <Button
+                    key={`triad-${chord.degree}`}
+                    variant={isActive ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => onSelectChord({ name: chord.name, notes: chord.notes })}
+                    className="justify-between"
+                  >
+                    <span>
+                      {chord.roman} - {chord.name}
+                    </span>
+                  </Button>
+                )
+              })}
             </div>
           </div>
 
           <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3">
             <p className="text-xs font-semibold text-zinc-200">Tetrades</p>
             <div className="mt-2 grid gap-2">
-              {tetrads.map((chord) => (
-                <Button
-                  key={`tetrad-${chord.degree}`}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onSelectChord({ name: chord.name, notes: chord.notes })}
-                  className="justify-between"
-                >
-                  <span>
-                    {chord.roman} - {chord.name}
-                  </span>
-                </Button>
-              ))}
+              {tetrads.map((chord) => {
+                const isActive = chordKey({ name: chord.name, notes: chord.notes }) === activeChordKey
+
+                return (
+                  <Button
+                    key={`tetrad-${chord.degree}`}
+                    variant={isActive ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => onSelectChord({ name: chord.name, notes: chord.notes })}
+                    className="justify-between"
+                  >
+                    <span>
+                      {chord.roman} - {chord.name}
+                    </span>
+                  </Button>
+                )
+              })}
             </div>
           </div>
         </div>

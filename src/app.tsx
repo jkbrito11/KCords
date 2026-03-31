@@ -9,6 +9,15 @@ import { ScaleFinderByNotesPanel } from './features/scales/ScaleFinderByNotesPan
 import { ScaleLibraryPanel } from './features/scales/ScaleLibraryPanel'
 import { useHarmonyStore } from './state/useHarmonyStore'
 
+type SelectableChord = {
+  name: string
+  notes: string[]
+}
+
+function chordKey(chord: SelectableChord) {
+  return `${chord.name}:${chord.notes.join('-')}`
+}
+
 export function App() {
   const root = useHarmonyStore((state) => state.root)
   const scaleId = useHarmonyStore((state) => state.scaleId)
@@ -19,6 +28,16 @@ export function App() {
   const setActiveChord = useHarmonyStore((state) => state.setActiveChord)
 
   const activeScaleNotes = scaleNotes(root, scaleId)
+  const activeChordKey = activeChord ? chordKey(activeChord) : null
+
+  const handleChordSelection = (chord: SelectableChord, source: 'manual' | 'harmony') => {
+    if (activeChord && chordKey(activeChord) === chordKey(chord)) {
+      setActiveChord(null)
+      return
+    }
+
+    setActiveChord({ name: chord.name, notes: chord.notes, source })
+  }
 
   return (
     <main className="mx-auto w-full max-w-[1440px] p-3 sm:p-6">
@@ -34,9 +53,7 @@ export function App() {
         <div className="grid gap-4">
           <InstrumentSetupPanel />
           <ScaleLibraryPanel />
-          <ChordManualPanel
-            onSelectChord={(chord) => setActiveChord({ name: chord.name, notes: chord.notes, source: 'manual' })}
-          />
+          <ChordManualPanel activeChordKey={activeChordKey} onSelectChord={(chord) => handleChordSelection(chord, 'manual')} />
           <ScaleFinderByNotesPanel />
         </div>
 
@@ -73,7 +90,8 @@ export function App() {
           <HarmonicFieldPanel
             root={root}
             scaleId={scaleId}
-            onSelectChord={(chord) => setActiveChord({ name: chord.name, notes: chord.notes, source: 'harmony' })}
+            activeChordKey={activeChordKey}
+            onSelectChord={(chord) => handleChordSelection(chord, 'harmony')}
           />
         </div>
       </section>
