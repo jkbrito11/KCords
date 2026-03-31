@@ -35,3 +35,14 @@ npm run dev
 ```bash
 npm run build
 ```
+
+## Documentacao para LLMs
+
+- [Indice de documentacao](docs/INDEX.md)
+- [Visao geral do projeto](docs/PROJECT_OVERVIEW.md)
+- [Arquitetura](docs/ARCHITECTURE.md)
+- [Dominio musical](docs/MUSIC_DOMAIN.md)
+- [Modelo de estado](docs/STATE_MODEL.md)
+- [Comportamentos de UI](docs/UI_BEHAVIOR.md)
+- [Runbook operacional](docs/OPERATIONS_RUNBOOK.md)
+- [Backlog e riscos](docs/BACKLOG_AND_RISKS.md)
