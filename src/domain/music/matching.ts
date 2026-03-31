@@ -10,7 +10,7 @@ export type ScaleMatch = {
   missing: string[]
 }
 
-const ROOTS = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B']
+const ROOTS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
 export function matchScalesByPitchSet(selectedNotes: string[], threshold = 0.5): ScaleMatch[] {
   const normalizedSelection = [...new Set(selectedNotes.map((note) => normalizeNote(note)))]

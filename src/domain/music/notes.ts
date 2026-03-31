@@ -29,7 +29,7 @@ const ENHARMONIC_TO_SHARP: Record<string, SharpNote> = {
   CB: 'B',
 }
 
-const SHARP_KEYS = new Set(['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#'])
+const SHARP_KEYS = new Set(CHROMATIC_SHARPS)
 
 export function normalizeNote(note: string): SharpNote {
   const normalized = note.trim().toUpperCase().replace('♯', '#').replace('♭', 'B')
