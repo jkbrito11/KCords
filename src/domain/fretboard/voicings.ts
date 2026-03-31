@@ -1,5 +1,5 @@
 import { buildFretboard } from './fretboard'
-import { normalizeNote } from '../music/notes'
+import { normalizeNote, noteToSemitone } from '../music/notes'
 import type { FretPosition } from './fretboard'
 import type { NoteName } from '../music/notes'
 
@@ -33,6 +33,40 @@ function voicingScore(positions: FretPosition[], uniqueNotesCount: number): numb
   return span * 8 + avgFret + openStrings * 0.5 + (4 - uniqueNotesCount) * 2
 }
 
+function buildOpenStringPitches(tuning: NoteName[]): number[] {
+  const openPitches: number[] = []
+
+  tuning.forEach((note, index) => {
+    const semitone = noteToSemitone(note)
+    if (index === 0) {
+      openPitches.push(semitone)
+      return
+    }
+
+    const previous = openPitches[index - 1]
+    let pitch = semitone
+    while (pitch <= previous) {
+      pitch += 12
+    }
+    openPitches.push(pitch)
+  })
+
+  return openPitches
+}
+
+function lowestRootPitch(
+  positions: FretPosition[],
+  rootNote: string,
+  openStringPitches: number[],
+): number {
+  const rootPositions = positions.filter((position) => normalizeNote(position.note) === rootNote)
+  if (rootPositions.length === 0) {
+    return Number.POSITIVE_INFINITY
+  }
+
+  return Math.min(...rootPositions.map((position) => openStringPitches[position.stringIndex] + position.fret))
+}
+
 export function generateChordVoicings(
   tuning: NoteName[],
   fretCount: number,
@@ -40,11 +74,13 @@ export function generateChordVoicings(
   maxResults = 8,
 ): ChordVoicing[] {
   const chordSet = new Set(chordNotes.map((note) => normalizeNote(note)))
+  const rootNote = normalizeNote(chordNotes[0] ?? '')
   if (chordSet.size < 3) {
     return []
   }
 
   const fretboard = buildFretboard(tuning, fretCount)
+  const openStringPitches = buildOpenStringPitches(tuning)
   const stringCount = tuning.length
   const maxFretToSearch = Math.min(fretCount, 12)
   const bestBySignature = new Map<string, { positions: FretPosition[]; score: number }>()
@@ -107,7 +143,11 @@ export function generateChordVoicings(
   }
 
   return [...bestBySignature.values()]
-    .sort((a, b) => a.score - b.score)
+    .sort((a, b) => {
+      const aRoot = lowestRootPitch(a.positions, rootNote, openStringPitches)
+      const bRoot = lowestRootPitch(b.positions, rootNote, openStringPitches)
+      return aRoot - bRoot || a.score - b.score
+    })
     .slice(0, maxResults)
     .map((entry, index) => {
       const frets = entry.positions.map((position) => position.fret)
