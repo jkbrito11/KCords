@@ -97,6 +97,24 @@ function keyLabel(note: string, root: string, viewMode: 'notes' | 'intervals', i
   return intervalInfo(note, root).label
 }
 
+type HighlightKind = 'none' | 'scale' | 'selected' | 'chord' | 'voicing'
+
+function resolveHighlightKind(note: string, layers: HighlightLayers, voicingNotes: string[]): HighlightKind {
+  if (containsNote(voicingNotes, note)) return 'voicing'
+  if (containsNote(layers.chordNotes, note)) return 'chord'
+  if (containsNote(layers.selectedNotes, note)) return 'selected'
+  if (containsNote(layers.scaleNotes, note)) return 'scale'
+  return 'none'
+}
+
+function markerClass(kind: HighlightKind) {
+  if (kind === 'scale') return 'border-sky-400 bg-sky-500'
+  if (kind === 'selected') return 'border-emerald-400 bg-emerald-500'
+  if (kind === 'chord') return 'border-amber-400 bg-amber-500'
+  if (kind === 'voicing') return 'border-fuchsia-400 bg-fuchsia-500'
+  return ''
+}
+
 export function PianoKeyboard({
   root,
   viewMode,
@@ -118,9 +136,7 @@ export function PianoKeyboard({
           <div className="flex">
             {whiteKeys.map((key) => {
               const inScale = containsNote(layers.scaleNotes, key.note)
-              const inChord = containsNote(layers.chordNotes, key.note)
-              const inSelected = containsNote(layers.selectedNotes, key.note)
-              const inVoicing = containsNote(voicingNotes, key.note)
+              const kind = resolveHighlightKind(key.note, layers, voicingNotes)
               const info = intervalInfo(key.note, root)
 
               return (
@@ -128,15 +144,11 @@ export function PianoKeyboard({
                   key={key.id}
                   title={`${key.note}${key.octave} • ${info.name} (${info.label})`}
                   className={cn(
-                    'flex h-32 w-10 flex-col justify-end border border-zinc-800 px-1 pb-2 text-center text-[10px] font-semibold transition-colors',
-                    !inScale && !inChord && !inSelected && !inVoicing && 'bg-zinc-100 text-zinc-800',
-                    inScale && 'bg-sky-200 text-sky-900',
-                    inSelected && 'bg-emerald-200 text-emerald-900',
-                    inChord && 'bg-amber-200 text-amber-900',
-                    inVoicing && 'bg-fuchsia-200 text-fuchsia-900',
+                    'flex h-32 w-10 flex-col items-center justify-end border border-zinc-800 bg-zinc-100 px-1 pb-2 text-center text-[10px] font-semibold text-zinc-800',
                   )}
                 >
-                  {keyLabel(key.note, root, viewMode, inScale)}
+                  <span>{keyLabel(key.note, root, viewMode, inScale)}</span>
+                  {kind !== 'none' ? <span className={cn('mt-1 h-2.5 w-2.5 rounded-full border', markerClass(kind))} /> : null}
                 </div>
               )
             })}
@@ -144,9 +156,7 @@ export function PianoKeyboard({
 
           {blackKeys.map((key) => {
             const inScale = containsNote(layers.scaleNotes, key.note)
-            const inChord = containsNote(layers.chordNotes, key.note)
-            const inSelected = containsNote(layers.selectedNotes, key.note)
-            const inVoicing = containsNote(voicingNotes, key.note)
+            const kind = resolveHighlightKind(key.note, layers, voicingNotes)
             const info = intervalInfo(key.note, root)
             const left = key.whiteIndex * WHITE_KEY_WIDTH - BLACK_KEY_WIDTH / 2
 
@@ -156,15 +166,11 @@ export function PianoKeyboard({
                 title={`${key.note}${key.octave} • ${info.name} (${info.label})`}
                 style={{ left: `${left}px`, width: `${BLACK_KEY_WIDTH}px` }}
                 className={cn(
-                  'absolute top-0 z-10 flex h-20 items-end justify-center rounded-b-md border border-zinc-900 pb-2 text-[9px] font-semibold text-zinc-200 transition-colors',
-                  !inScale && !inChord && !inSelected && !inVoicing && 'bg-zinc-900',
-                  inScale && 'bg-sky-700 text-sky-100',
-                  inSelected && 'bg-emerald-700 text-emerald-100',
-                  inChord && 'bg-amber-700 text-amber-100',
-                  inVoicing && 'bg-fuchsia-700 text-fuchsia-100',
+                  'absolute top-0 z-10 flex h-20 flex-col items-center justify-end rounded-b-md border border-zinc-900 bg-zinc-900 pb-2 text-[9px] font-semibold text-zinc-200',
                 )}
               >
-                {keyLabel(key.note, root, viewMode, inScale)}
+                <span>{keyLabel(key.note, root, viewMode, inScale)}</span>
+                {kind !== 'none' ? <span className={cn('mt-1 h-2.5 w-2.5 rounded-full border', markerClass(kind))} /> : null}
               </div>
             )
           })}
