@@ -3,7 +3,6 @@ import { Fretboard } from './components/fretboard/Fretboard'
 import { FretboardLegend } from './components/fretboard/FretboardLegend'
 import { Button } from './components/ui/button'
 import { Card } from './components/ui/card'
-import { Select } from './components/ui/select'
 import { generateChordVoicings } from './domain/fretboard/voicings'
 import { scaleNotes } from './domain/music/scales'
 import { ChordManualPanel } from './features/chords/ChordManualPanel'
@@ -129,24 +128,36 @@ export function App() {
 
                 {chordDisplayMode === 'voicings' ? (
                   <div className="grid gap-1">
-                    <label className="text-xs text-zinc-400">
-                      Forma da digitacao
-                      <Select
-                        className="mt-1"
-                        value={String(activeVoicingIndex)}
-                        onChange={(event) => setActiveVoicingIndex(Number(event.currentTarget.value))}
-                        disabled={chordVoicings.length === 0}
+                    <p className="text-xs text-zinc-400">Forma da digitacao</p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setActiveVoicingIndex((index) => Math.max(index - 1, 0))}
+                        disabled={chordVoicings.length === 0 || activeVoicingIndex === 0}
                       >
-                        {chordVoicings.length === 0 ? <option value="0">Nenhuma digitacao encontrada</option> : null}
-                        {chordVoicings.map((voicing, index) => (
-                          <option key={voicing.id} value={index}>
-                            {voicing.label}
-                          </option>
-                        ))}
-                      </Select>
-                    </label>
+                        ←
+                      </Button>
+                      <div className="min-w-0 flex-1 rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-zinc-200">
+                        {selectedVoicing ? selectedVoicing.label : 'Nenhuma digitacao encontrada'}
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          setActiveVoicingIndex((index) => Math.min(index + 1, Math.max(chordVoicings.length - 1, 0)))
+                        }
+                        disabled={
+                          chordVoicings.length === 0 || activeVoicingIndex >= Math.max(chordVoicings.length - 1, 0)
+                        }
+                      >
+                        →
+                      </Button>
+                    </div>
                     {selectedVoicing ? (
-                      <p className="text-xs text-fuchsia-200">Mostrando: {selectedVoicing.label}</p>
+                      <p className="text-xs text-fuchsia-200">
+                        Mostrando: {selectedVoicing.label} ({activeVoicingIndex + 1}/{chordVoicings.length})
+                      </p>
                     ) : (
                       <p className="text-xs text-zinc-500">Tente outro acorde ou ajuste a afinação/casas.</p>
                     )}
