@@ -20,6 +20,21 @@ const INTERVAL_LABELS: Record<number, string> = {
   11: '7',
 }
 
+const INTERVAL_NAMES_PT_BR: Record<number, string> = {
+  0: 'Unissono (Tonica)',
+  1: 'Segunda menor',
+  2: 'Segunda maior',
+  3: 'Terca menor',
+  4: 'Terca maior',
+  5: 'Quarta justa',
+  6: 'Tritono',
+  7: 'Quinta justa',
+  8: 'Sexta menor',
+  9: 'Sexta maior',
+  10: 'Setima menor',
+  11: 'Setima maior',
+}
+
 const SINGLE_MARKER_FRETS = new Set([3, 5, 7, 9, 15, 17, 19, 21])
 const DOUBLE_MARKER_FRETS = new Set([12, 24])
 
@@ -39,6 +54,14 @@ function noteLabel(note: string, root: string, viewMode: 'notes' | 'intervals', 
 
   const distance = (noteToSemitone(note) - noteToSemitone(root) + 12) % 12
   return INTERVAL_LABELS[distance] ?? note
+}
+
+function noteIntervalInfo(note: string, root: string) {
+  const distance = (noteToSemitone(note) - noteToSemitone(root) + 12) % 12
+  return {
+    label: INTERVAL_LABELS[distance] ?? '?',
+    name: INTERVAL_NAMES_PT_BR[distance] ?? 'Intervalo',
+  }
 }
 
 export function Fretboard({ root, viewMode, tuning, fretCount, layers, voicingPositions = [] }: FretboardProps) {
@@ -70,10 +93,12 @@ export function Fretboard({ root, viewMode, tuning, fretCount, layers, voicingPo
                 const inSelected = isManuallySelected(position.note, layers)
                 const inVoicing = voicingSet.has(`${position.stringIndex}-${position.fret}`)
                 const label = noteLabel(position.note, root, viewMode, inScale)
+                const intervalInfo = noteIntervalInfo(position.note, root)
 
                 return (
                   <td key={`${position.stringIndex}-${position.fret}`} className="border-l border-t border-zinc-900 p-1">
                     <span
+                      title={`${position.note} • ${intervalInfo.name} (${intervalInfo.label})`}
                       className={cn(
                         'mx-auto flex h-8 w-8 items-center justify-center rounded-full border text-[11px] font-semibold transition-colors',
                         !inScale && !inChord && !inSelected && 'border-zinc-800 bg-zinc-900 text-zinc-500',
