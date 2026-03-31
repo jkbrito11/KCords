@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import { Fretboard } from './components/fretboard/Fretboard'
 import { FretboardLegend } from './components/fretboard/FretboardLegend'
+import { PianoKeyboard } from './components/piano/PianoKeyboard'
 import { Button } from './components/ui/button'
 import { Card } from './components/ui/card'
 import { generateChordVoicings } from './domain/fretboard/voicings'
@@ -53,6 +54,10 @@ export function App() {
   }, [chordVoicings.length])
 
   const selectedVoicing = chordVoicings[activeVoicingIndex] ?? null
+  const selectedVoicingNotes = useMemo(
+    () => (selectedVoicing ? [...new Set(selectedVoicing.positions.map((position) => position.note))] : []),
+    [selectedVoicing],
+  )
 
   const handleChordSelection = (chord: SelectableChord, source: 'manual' | 'harmony') => {
     if (activeChord && chordKey(activeChord) === chordKey(chord)) {
@@ -177,6 +182,17 @@ export function App() {
               tuning={tuning}
               fretCount={fretCount}
               voicingPositions={chordDisplayMode === 'voicings' && selectedVoicing ? selectedVoicing.positions : []}
+              layers={{
+                scaleNotes: activeScaleNotes,
+                chordNotes: chordDisplayMode === 'full-neck' ? activeChord?.notes ?? [] : [],
+                selectedNotes,
+              }}
+            />
+
+            <PianoKeyboard
+              root={root}
+              viewMode={fretboardViewMode}
+              voicingNotes={chordDisplayMode === 'voicings' ? selectedVoicingNotes : []}
               layers={{
                 scaleNotes: activeScaleNotes,
                 chordNotes: chordDisplayMode === 'full-neck' ? activeChord?.notes ?? [] : [],
