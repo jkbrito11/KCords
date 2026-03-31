@@ -67,6 +67,29 @@ function lowestRootPitch(
   return Math.min(...rootPositions.map((position) => openStringPitches[position.stringIndex] + position.fret))
 }
 
+function bassNote(positions: FretPosition[], openStringPitches: number[]): string {
+  const ordered = positions
+    .slice()
+    .sort(
+      (a, b) =>
+        openStringPitches[a.stringIndex] + a.fret - (openStringPitches[b.stringIndex] + b.fret),
+    )
+
+  return normalizeNote(ordered[0]?.note ?? '')
+}
+
+function inversionLabel(chordNotes: string[], bassNormalizedNote: string): string | null {
+  const orderedChordTones = [...new Set(chordNotes.map((note) => normalizeNote(note)))]
+  const inversionIndex = orderedChordTones.findIndex((note) => note === bassNormalizedNote)
+
+  if (inversionIndex <= 0) {
+    return null
+  }
+
+  const labels = ['1a inversao', '2a inversao', '3a inversao']
+  return labels[inversionIndex - 1] ?? `${inversionIndex}a inversao`
+}
+
 export function generateChordVoicings(
   tuning: NoteName[],
   fretCount: number,
@@ -153,9 +176,14 @@ export function generateChordVoicings(
       const frets = entry.positions.map((position) => position.fret)
       const minFret = Math.min(...frets)
       const maxFret = Math.max(...frets)
+      const bass = bassNote(entry.positions, openStringPitches)
+      const inversion = inversionLabel(chordNotes, bass)
+
       return {
         id: `voicing-${index + 1}`,
-        label: `Forma ${index + 1} (${minFret}-${maxFret})`,
+        label: inversion
+          ? `Forma ${index + 1} (${minFret}-${maxFret}) • ${inversion}`
+          : `Forma ${index + 1} (${minFret}-${maxFret})`,
         positions: entry.positions,
       }
     })
