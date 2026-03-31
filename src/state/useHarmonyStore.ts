@@ -23,6 +23,7 @@ type HarmonyState = {
   setStringCount: (count: 6 | 7) => void
   setTuningNote: (index: number, note: NoteName) => void
   setFretCount: (fretCount: number) => void
+  setInstrumentConfig: (config: { stringCount: 6 | 7; tuning: NoteName[]; fretCount: number }) => void
   toggleSelectedNote: (note: string) => void
   clearSelectedNotes: () => void
   setActiveChord: (chord: ActiveChord | null) => void
@@ -52,6 +53,12 @@ export const useHarmonyStore = create<HarmonyState>((set) => ({
       return { tuning }
     }),
   setFretCount: (fretCount) => set({ fretCount }),
+  setInstrumentConfig: ({ stringCount, tuning, fretCount }) =>
+    set({
+      stringCount,
+      tuning,
+      fretCount,
+    }),
   toggleSelectedNote: (note) =>
     set((state) => {
       const selectedNotes = state.selectedNotes.includes(note)

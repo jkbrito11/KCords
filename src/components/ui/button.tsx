@@ -23,7 +23,7 @@ const buttonVariants = cva(
   },
 )
 
-type ButtonProps = JSX.HTMLAttributes<HTMLButtonElement> & VariantProps<typeof buttonVariants>
+type ButtonProps = JSX.IntrinsicElements['button'] & VariantProps<typeof buttonVariants>
 
 export function Button({ className, variant, size, ...props }: ButtonProps) {
   return <button className={cn(buttonVariants({ variant, size }), className)} {...props} />
