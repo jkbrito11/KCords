@@ -5,7 +5,7 @@ import { PianoKeyboard } from './components/piano/PianoKeyboard'
 import { Button } from './components/ui/button'
 import { Card } from './components/ui/card'
 import { generateChordVoicings } from './domain/fretboard/voicings'
-import { playChordByNames } from './lib/audio'
+import { playVoicingPhraseByNames } from './lib/audio'
 import { scaleNotes } from './domain/music/scales'
 import { ChordManualPanel } from './features/chords/ChordManualPanel'
 import { HarmonicFieldPanel } from './features/harmony/HarmonicFieldPanel'
@@ -60,13 +60,20 @@ export function App() {
     [selectedVoicing],
   )
 
+  useEffect(() => {
+    if (chordDisplayMode !== 'voicings' || selectedVoicingNotes.length === 0) {
+      return
+    }
+
+    void playVoicingPhraseByNames(selectedVoicingNotes, 3)
+  }, [chordDisplayMode, selectedVoicingNotes.join('|')])
+
   const handleChordSelection = (chord: SelectableChord, source: 'manual' | 'harmony') => {
     if (activeChord && chordKey(activeChord) === chordKey(chord)) {
       setActiveChord(null)
       return
     }
 
-    void playChordByNames(chord.notes, 3)
     setActiveChord({ name: chord.name, notes: chord.notes, source })
   }
 
