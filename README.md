@@ -2,6 +2,10 @@
 
 Aplicacao de apoio ao estudo de harmonia musical para guitarristas, com foco em visualizacao no fretboard.
 
+## Versao
+
+- v1.0.0 estavel
+
 ## Stack
 
 - Preact + TypeScript (Vite)
