@@ -1,8 +1,10 @@
-import { useState } from 'preact/hooks'
+import { useEffect, useMemo, useState } from 'preact/hooks'
 import { Fretboard } from './components/fretboard/Fretboard'
 import { FretboardLegend } from './components/fretboard/FretboardLegend'
 import { Button } from './components/ui/button'
 import { Card } from './components/ui/card'
+import { Select } from './components/ui/select'
+import { generateChordVoicings } from './domain/fretboard/voicings'
 import { scaleNotes } from './domain/music/scales'
 import { ChordManualPanel } from './features/chords/ChordManualPanel'
 import { HarmonicFieldPanel } from './features/harmony/HarmonicFieldPanel'
@@ -22,6 +24,8 @@ function chordKey(chord: SelectableChord) {
 
 export function App() {
   const [instrumentMenuOpen, setInstrumentMenuOpen] = useState(false)
+  const [chordDisplayMode, setChordDisplayMode] = useState<'full-neck' | 'voicings'>('full-neck')
+  const [activeVoicingIndex, setActiveVoicingIndex] = useState(0)
 
   const root = useHarmonyStore((state) => state.root)
   const scaleId = useHarmonyStore((state) => state.scaleId)
@@ -35,6 +39,17 @@ export function App() {
 
   const activeScaleNotes = scaleNotes(root, scaleId)
   const activeChordKey = activeChord ? chordKey(activeChord) : null
+  const chordVoicings = useMemo(
+    () => (activeChord ? generateChordVoicings(tuning, fretCount, activeChord.notes, 10) : []),
+    [activeChordKey, tuning, fretCount],
+  )
+
+  useEffect(() => {
+    setChordDisplayMode('full-neck')
+    setActiveVoicingIndex(0)
+  }, [activeChordKey])
+
+  const selectedVoicing = chordVoicings[activeVoicingIndex] ?? null
 
   const handleChordSelection = (chord: SelectableChord, source: 'manual' | 'harmony') => {
     if (activeChord && chordKey(activeChord) === chordKey(chord)) {
@@ -92,15 +107,64 @@ export function App() {
               )}
             </div>
 
+            {activeChord ? (
+              <div className="grid gap-2 rounded-lg border border-zinc-800 bg-zinc-950 p-3">
+                <p className="text-xs text-zinc-400">Modo de visualizacao do acorde</p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant={chordDisplayMode === 'full-neck' ? 'default' : 'outline'}
+                    onClick={() => setChordDisplayMode('full-neck')}
+                  >
+                    Braco completo
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={chordDisplayMode === 'voicings' ? 'default' : 'outline'}
+                    onClick={() => setChordDisplayMode('voicings')}
+                  >
+                    Digitacoes
+                  </Button>
+                </div>
+
+                {chordDisplayMode === 'voicings' ? (
+                  <div className="grid gap-1">
+                    <label className="text-xs text-zinc-400">
+                      Forma da digitacao
+                      <Select
+                        className="mt-1"
+                        value={String(activeVoicingIndex)}
+                        onChange={(event) => setActiveVoicingIndex(Number(event.currentTarget.value))}
+                        disabled={chordVoicings.length === 0}
+                      >
+                        {chordVoicings.length === 0 ? <option value="0">Nenhuma digitacao encontrada</option> : null}
+                        {chordVoicings.map((voicing, index) => (
+                          <option key={voicing.id} value={index}>
+                            {voicing.label}
+                          </option>
+                        ))}
+                      </Select>
+                    </label>
+                    {selectedVoicing ? (
+                      <p className="text-xs text-fuchsia-200">Mostrando: {selectedVoicing.label}</p>
+                    ) : (
+                      <p className="text-xs text-zinc-500">Tente outro acorde ou ajuste a afinação/casas.</p>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
             <FretboardLegend />
             <Fretboard
               root={root}
               viewMode={fretboardViewMode}
               tuning={tuning}
               fretCount={fretCount}
+              voicingPositions={chordDisplayMode === 'voicings' && selectedVoicing ? selectedVoicing.positions : []}
               layers={{
                 scaleNotes: activeScaleNotes,
-                chordNotes: activeChord?.notes ?? [],
+                chordNotes: chordDisplayMode === 'full-neck' ? activeChord?.notes ?? [] : [],
                 selectedNotes,
               }}
             />

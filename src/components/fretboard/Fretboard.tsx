@@ -29,6 +29,7 @@ type FretboardProps = {
   tuning: NoteName[]
   fretCount: number
   layers: HighlightLayers
+  voicingPositions?: Array<{ stringIndex: number; fret: number }>
 }
 
 function noteLabel(note: string, root: string, viewMode: 'notes' | 'intervals', inScale: boolean) {
@@ -40,8 +41,9 @@ function noteLabel(note: string, root: string, viewMode: 'notes' | 'intervals', 
   return INTERVAL_LABELS[distance] ?? note
 }
 
-export function Fretboard({ root, viewMode, tuning, fretCount, layers }: FretboardProps) {
+export function Fretboard({ root, viewMode, tuning, fretCount, layers, voicingPositions = [] }: FretboardProps) {
   const strings = buildFretboard(tuning, fretCount)
+  const voicingSet = new Set(voicingPositions.map((position) => `${position.stringIndex}-${position.fret}`))
 
   return (
     <div className="overflow-x-auto rounded-xl border border-zinc-800">
@@ -66,6 +68,7 @@ export function Fretboard({ root, viewMode, tuning, fretCount, layers }: Fretboa
                 const inScale = isInScale(position.note, layers)
                 const inChord = isInChord(position.note, layers)
                 const inSelected = isManuallySelected(position.note, layers)
+                const inVoicing = voicingSet.has(`${position.stringIndex}-${position.fret}`)
                 const label = noteLabel(position.note, root, viewMode, inScale)
 
                 return (
@@ -77,6 +80,7 @@ export function Fretboard({ root, viewMode, tuning, fretCount, layers }: Fretboa
                         inScale && 'border-sky-500/50 bg-sky-500/20 text-sky-100',
                         inSelected && 'border-emerald-500 bg-emerald-500/25 text-emerald-100',
                         inChord && 'border-amber-400 bg-amber-500/25 text-amber-100',
+                        inVoicing && 'border-fuchsia-400 bg-fuchsia-500/25 text-fuchsia-100',
                       )}
                     >
                       {label}
