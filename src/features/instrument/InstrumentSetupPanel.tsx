@@ -8,6 +8,22 @@ import { useHarmonyStore } from '../../state/useHarmonyStore'
 
 const STORAGE_KEY = 'kcords.instrumentProfiles.v1'
 
+type TuningPreset = {
+  id: string
+  label: string
+  tuning: NoteName[]
+}
+
+const TUNING_PRESETS: TuningPreset[] = [
+  { id: 'e_standard', label: 'E Standart', tuning: ['E', 'A', 'D', 'G', 'B', 'E'] },
+  { id: 'd_drop', label: 'D Drop', tuning: ['D', 'A', 'D', 'G', 'B', 'E'] },
+  { id: 'ds_standard', label: 'D# Standart', tuning: ['D#', 'G#', 'C#', 'F#', 'A#', 'D#'] },
+  { id: 'd_standard', label: 'D Standart', tuning: ['D', 'G', 'C', 'F', 'A', 'D'] },
+  { id: 'cs_standard', label: 'C# Standart', tuning: ['C#', 'F#', 'B', 'E', 'G#', 'C#'] },
+  { id: 'c_standard', label: 'C Standart', tuning: ['C', 'F', 'A#', 'D#', 'G', 'C'] },
+  { id: 'b_standard', label: 'B Standart', tuning: ['B', 'E', 'A', 'D', 'F#', 'B'] },
+]
+
 type InstrumentProfile = {
   id: string
   name: string
@@ -49,6 +65,7 @@ export function InstrumentSetupPanel({ onClose }: InstrumentSetupPanelProps) {
   const [profiles, setProfiles] = useState<InstrumentProfile[]>([])
   const [profileName, setProfileName] = useState('')
   const [selectedProfileId, setSelectedProfileId] = useState<string>('')
+  const [selectedPresetId, setSelectedPresetId] = useState<string>('custom')
 
   useEffect(() => {
     const loaded = readProfiles()
@@ -57,6 +74,16 @@ export function InstrumentSetupPanel({ onClose }: InstrumentSetupPanelProps) {
       setSelectedProfileId(loaded[0].id)
     }
   }, [])
+
+  useEffect(() => {
+    if (stringCount !== 6) {
+      setSelectedPresetId('custom')
+      return
+    }
+
+    const foundPreset = TUNING_PRESETS.find((preset) => preset.tuning.join('|') === tuning.join('|'))
+    setSelectedPresetId(foundPreset?.id ?? 'custom')
+  }, [stringCount, tuning])
 
   const selectedProfile = useMemo(
     () => profiles.find((profile) => profile.id === selectedProfileId) ?? null,
@@ -103,6 +130,20 @@ export function InstrumentSetupPanel({ onClose }: InstrumentSetupPanelProps) {
     writeProfiles(updated)
   }
 
+  const applyTuningPreset = (presetId: string) => {
+    setSelectedPresetId(presetId)
+    const preset = TUNING_PRESETS.find((item) => item.id === presetId)
+    if (!preset) {
+      return
+    }
+
+    setInstrumentConfig({
+      stringCount: 6,
+      fretCount,
+      tuning: preset.tuning,
+    })
+  }
+
   return (
     <Card className="h-full">
       <div className="flex items-center justify-between gap-3">
@@ -146,6 +187,18 @@ export function InstrumentSetupPanel({ onClose }: InstrumentSetupPanelProps) {
             Salvar configuracao atual
           </Button>
         </div>
+
+        <label className="grid gap-1 text-xs text-zinc-400">
+          Afinacoes pre-configuradas
+          <Select value={selectedPresetId} onChange={(event) => applyTuningPreset(event.currentTarget.value)}>
+            <option value="custom">Personalizada</option>
+            {TUNING_PRESETS.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.label}
+              </option>
+            ))}
+          </Select>
+        </label>
 
         <label className="grid gap-1 text-xs text-zinc-400">
           Numero de cordas
