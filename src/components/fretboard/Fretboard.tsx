@@ -1,16 +1,43 @@
 import { buildFretboard } from '../../domain/fretboard/fretboard'
 import { isInChord, isInScale, isManuallySelected } from '../../domain/fretboard/highlight'
+import { noteToSemitone } from '../../domain/music/notes'
 import type { HighlightLayers } from '../../domain/fretboard/highlight'
 import type { NoteName } from '../../domain/music/notes'
 import { cn } from '../../lib/utils'
 
+const INTERVAL_LABELS: Record<number, string> = {
+  0: '1',
+  1: 'b2',
+  2: '2',
+  3: 'b3',
+  4: '3',
+  5: '4',
+  6: 'b5',
+  7: '5',
+  8: 'b6',
+  9: '6',
+  10: 'b7',
+  11: '7',
+}
+
 type FretboardProps = {
+  root: string
+  viewMode: 'notes' | 'intervals'
   tuning: NoteName[]
   fretCount: number
   layers: HighlightLayers
 }
 
-export function Fretboard({ tuning, fretCount, layers }: FretboardProps) {
+function noteLabel(note: string, root: string, viewMode: 'notes' | 'intervals', inScale: boolean) {
+  if (viewMode === 'notes' || !inScale) {
+    return note
+  }
+
+  const distance = (noteToSemitone(note) - noteToSemitone(root) + 12) % 12
+  return INTERVAL_LABELS[distance] ?? note
+}
+
+export function Fretboard({ root, viewMode, tuning, fretCount, layers }: FretboardProps) {
   const strings = buildFretboard(tuning, fretCount)
 
   return (
@@ -36,6 +63,7 @@ export function Fretboard({ tuning, fretCount, layers }: FretboardProps) {
                 const inScale = isInScale(position.note, layers)
                 const inChord = isInChord(position.note, layers)
                 const inSelected = isManuallySelected(position.note, layers)
+                const label = noteLabel(position.note, root, viewMode, inScale)
 
                 return (
                   <td key={`${position.stringIndex}-${position.fret}`} className="border-l border-t border-zinc-900 p-1">
@@ -48,7 +76,7 @@ export function Fretboard({ tuning, fretCount, layers }: FretboardProps) {
                         inChord && 'border-amber-400 bg-amber-500/25 text-amber-100',
                       )}
                     >
-                      {position.note}
+                      {label}
                     </span>
                   </td>
                 )

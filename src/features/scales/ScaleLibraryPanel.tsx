@@ -7,8 +7,10 @@ import { useHarmonyStore } from '../../state/useHarmonyStore'
 export function ScaleLibraryPanel() {
   const root = useHarmonyStore((s) => s.root)
   const scaleId = useHarmonyStore((s) => s.scaleId)
+  const fretboardViewMode = useHarmonyStore((s) => s.fretboardViewMode)
   const setRoot = useHarmonyStore((s) => s.setRoot)
   const setScaleId = useHarmonyStore((s) => s.setScaleId)
+  const setFretboardViewMode = useHarmonyStore((s) => s.setFretboardViewMode)
 
   const currentScaleNotes = scaleNotes(root, scaleId)
 
@@ -38,6 +40,14 @@ export function ScaleLibraryPanel() {
             </Select>
           </label>
         </div>
+
+        <label className="grid gap-1 text-xs text-zinc-400">
+          Exibicao no fretboard
+          <Select value={fretboardViewMode} onChange={(event) => setFretboardViewMode(event.currentTarget.value as 'notes' | 'intervals')}>
+            <option value="notes">Notas</option>
+            <option value="intervals">Intervalos da escala</option>
+          </Select>
+        </label>
 
         <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-300">
           <p className="text-zinc-400">Notas da escala ativa</p>

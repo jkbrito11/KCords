@@ -11,6 +11,7 @@ type ActiveChord = {
 type HarmonyState = {
   root: string
   scaleId: string
+  fretboardViewMode: 'notes' | 'intervals'
   stringCount: 6 | 7
   tuning: NoteName[]
   fretCount: number
@@ -18,6 +19,7 @@ type HarmonyState = {
   activeChord: ActiveChord | null
   setRoot: (root: string) => void
   setScaleId: (scaleId: string) => void
+  setFretboardViewMode: (mode: 'notes' | 'intervals') => void
   setStringCount: (count: 6 | 7) => void
   setTuningNote: (index: number, note: NoteName) => void
   setFretCount: (fretCount: number) => void
@@ -29,6 +31,7 @@ type HarmonyState = {
 export const useHarmonyStore = create<HarmonyState>((set) => ({
   root: 'C',
   scaleId: 'major',
+  fretboardViewMode: 'notes',
   stringCount: 6,
   tuning: [...STANDARD_TUNING_6],
   fretCount: 15,
@@ -36,6 +39,7 @@ export const useHarmonyStore = create<HarmonyState>((set) => ({
   activeChord: null,
   setRoot: (root) => set({ root }),
   setScaleId: (scaleId) => set({ scaleId }),
+  setFretboardViewMode: (fretboardViewMode) => set({ fretboardViewMode }),
   setStringCount: (stringCount) =>
     set({
       stringCount,

@@ -21,6 +21,7 @@ function chordKey(chord: SelectableChord) {
 export function App() {
   const root = useHarmonyStore((state) => state.root)
   const scaleId = useHarmonyStore((state) => state.scaleId)
+  const fretboardViewMode = useHarmonyStore((state) => state.fretboardViewMode)
   const tuning = useHarmonyStore((state) => state.tuning)
   const fretCount = useHarmonyStore((state) => state.fretCount)
   const selectedNotes = useHarmonyStore((state) => state.selectedNotes)
@@ -77,6 +78,8 @@ export function App() {
 
             <FretboardLegend />
             <Fretboard
+              root={root}
+              viewMode={fretboardViewMode}
               tuning={tuning}
               fretCount={fretCount}
               layers={{
