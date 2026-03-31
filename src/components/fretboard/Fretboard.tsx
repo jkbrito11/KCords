@@ -20,6 +20,9 @@ const INTERVAL_LABELS: Record<number, string> = {
   11: '7',
 }
 
+const SINGLE_MARKER_FRETS = new Set([3, 5, 7, 9, 15, 17, 19, 21])
+const DOUBLE_MARKER_FRETS = new Set([12, 24])
+
 type FretboardProps = {
   root: string
   viewMode: 'notes' | 'intervals'
@@ -84,6 +87,29 @@ export function Fretboard({ root, viewMode, tuning, fretCount, layers }: Fretboa
             </tr>
           ))}
         </tbody>
+        <tfoot>
+          <tr>
+            <td className="sticky left-0 z-10 border-t border-zinc-800 bg-zinc-950 p-2 text-[10px] text-zinc-500">Marcacoes</td>
+            {Array.from({ length: fretCount + 1 }, (_, fret) => {
+              const hasSingle = SINGLE_MARKER_FRETS.has(fret)
+              const hasDouble = DOUBLE_MARKER_FRETS.has(fret)
+
+              return (
+                <td key={`marker-${fret}`} className="border-l border-t border-zinc-900 p-1">
+                  <div className="mx-auto flex h-8 w-8 items-center justify-center gap-1">
+                    {hasSingle ? <span className="h-1.5 w-1.5 rounded-full bg-zinc-600" aria-hidden="true" /> : null}
+                    {hasDouble ? (
+                      <>
+                        <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" aria-hidden="true" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" aria-hidden="true" />
+                      </>
+                    ) : null}
+                  </div>
+                </td>
+              )
+            })}
+          </tr>
+        </tfoot>
       </table>
     </div>
   )
