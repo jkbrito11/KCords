@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kcords-v1'
+const CACHE_NAME = 'kcords-v2'
 const ASSETS_TO_CACHE = ['/', '/index.html', '/manifest.webmanifest', '/pwa-icon.svg', '/favicon.svg']
 
 self.addEventListener('install', (event) => {
@@ -19,31 +19,61 @@ self.addEventListener('activate', (event) => {
   self.clients.claim()
 })
 
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
+})
+
+async function networkFirst(request, fallbackUrl) {
+  try {
+    const response = await fetch(request)
+    if (response && response.status === 200 && response.type === 'basic') {
+      const cache = await caches.open(CACHE_NAME)
+      cache.put(request, response.clone())
+    }
+    return response
+  } catch {
+    const cached = await caches.match(request)
+    if (cached) {
+      return cached
+    }
+    return caches.match(fallbackUrl)
+  }
+}
+
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_NAME)
+  const cached = await cache.match(request)
+  const networkPromise = fetch(request)
+    .then((response) => {
+      if (response && response.status === 200 && response.type === 'basic') {
+        cache.put(request, response.clone())
+      }
+      return response
+    })
+    .catch(() => null)
+
+  return cached || networkPromise || caches.match('/index.html')
+}
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') {
     return
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse
-      }
+  const url = new URL(event.request.url)
 
-      return fetch(event.request)
-        .then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-            return networkResponse
-          }
+  // For SPA navigation, prefer network to get latest build quickly.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(networkFirst(event.request, '/index.html'))
+    return
+  }
 
-          const responseClone = networkResponse.clone()
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone)
-          })
+  if (url.origin === self.location.origin) {
+    event.respondWith(staleWhileRevalidate(event.request))
+    return
+  }
 
-          return networkResponse
-        })
-        .catch(() => caches.match('/index.html'))
-    }),
-  )
+  event.respondWith(fetch(event.request).catch(() => caches.match(event.request)))
 })
