@@ -1,27 +1,24 @@
-# dependencies
-node_modules/
-
-# build output
-dist/
-coverage/
-
-# logs
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
-# environment
-.env
-.env.*
-!.env.example
+node_modules
+dist
+dist-ssr
+*.local
 
-# editor and OS
+# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-!.vscode/settings.json
+.idea
 .DS_Store
-Thumbs.db
-
-# misc
-*.local
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

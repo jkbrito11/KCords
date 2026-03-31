@@ -1,22 +1,33 @@
 # KCords
 
-Aplicacao web para estudo de harmonia musical para guitarristas, com foco em fretboard interativo, escalas, acordes e campo harmonico.
+Aplicacao de apoio ao estudo de harmonia musical para guitarristas, com foco em visualizacao no fretboard.
 
 ## Stack
 
-- Preact (via Vite)
-- TypeScript
+- Preact + TypeScript (Vite)
 - Tailwind CSS
-- shadcn/ui (componentes base)
+- Componentes no padrao shadcn/ui
+- Zustand para estado global
 
-## Roadmap de Implementacao
+## Funcionalidades implementadas na base
 
-O projeto segue fases incrementais com commit ao final de cada fase.
+- Fretboard dinamico por afinacao configuravel
+- Suporte para guitarra de 6 e 7 cordas
+- Biblioteca de escalas (diatonicas, pentatonicas e modos)
+- Manual de acordes em triades e tetrades
+- Busca reversa de escalas por selecao de 2 ou mais notas
+- Campo harmonico (triades e tetrades) com destaque no fretboard
+- Exibicao de opcoes de acordes relativos
 
-1. Fase 0: Git e baseline
-2. Fase 1: Bootstrap e fundacao
-3. Fase 2: Motor musical
-4. Fase 3: Fretboard e afinacoes
-5. Fase 4: Fluxos de UX
-6. Fase 5: Refinos e responsividade
-7. Fase 6: Testes e validacao
+## Execucao
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
