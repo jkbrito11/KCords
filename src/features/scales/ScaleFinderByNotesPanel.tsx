@@ -1,6 +1,7 @@
 import { Card, CardTitle } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
 import { matchScalesByPitchSet } from '../../domain/music/matching'
+import { playNoteByName } from '../../lib/audio'
 import { NOTE_OPTIONS } from '../../lib/music-constants'
 import { cn } from '../../lib/utils'
 import { useHarmonyStore } from '../../state/useHarmonyStore'
@@ -26,7 +27,10 @@ export function ScaleFinderByNotesPanel() {
               <button
                 key={note}
                 type="button"
-                onClick={() => toggleSelectedNote(note)}
+                onClick={() => {
+                  toggleSelectedNote(note)
+                  void playNoteByName(note, 4)
+                }}
                 className={cn(
                   'rounded-md border px-2 py-1 text-xs font-medium transition-colors',
                   active
