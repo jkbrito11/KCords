@@ -91,22 +91,22 @@ export function relativeOptions(root: string, scaleId: string): RelativeOption[]
 
   if (scaleId === 'major') {
     return [
-      { label: 'Relative Minor (vi)', root: semitoneToNote(semitone + 9, preferSharps), scaleId: 'natural_minor' },
-      { label: 'Parallel Minor', root: semitoneToNote(semitone, preferSharps), scaleId: 'natural_minor' },
+      { label: 'Relativa Menor (vi)', root: semitoneToNote(semitone + 9, preferSharps), scaleId: 'natural_minor' },
+      { label: 'Menor Paralela', root: semitoneToNote(semitone, preferSharps), scaleId: 'natural_minor' },
     ]
   }
 
   if (scaleId === 'natural_minor') {
     return [
-      { label: 'Relative Major (III)', root: semitoneToNote(semitone + 3, preferSharps), scaleId: 'major' },
-      { label: 'Parallel Major', root: semitoneToNote(semitone, preferSharps), scaleId: 'major' },
+      { label: 'Relativa Maior (III)', root: semitoneToNote(semitone + 3, preferSharps), scaleId: 'major' },
+      { label: 'Maior Paralela', root: semitoneToNote(semitone, preferSharps), scaleId: 'major' },
     ]
   }
 
   const parentMajorRoot = semitoneToNote(semitone + 7, preferSharps)
   return [
-    { label: 'Closest Major Context', root: parentMajorRoot, scaleId: 'major' },
-    { label: 'Parallel Minor Context', root: semitoneToNote(semitone, preferSharps), scaleId: 'natural_minor' },
+    { label: 'Contexto Maior Mais Proximo', root: parentMajorRoot, scaleId: 'major' },
+    { label: 'Contexto Menor Paralelo', root: semitoneToNote(semitone, preferSharps), scaleId: 'natural_minor' },
   ]
 }
 
